@@ -27,6 +27,14 @@ module.exports = function ( grunt ) {
         
         uglify: {
             src: {
+                options: {
+                    banner: "/*! <%= pkg.name %> - v<%= pkg.version %> - " +
+                        "<%= grunt.template.today('yyyy-mm-dd') %> */\n",
+                    beautify: {
+                        width: 80,
+                        beautify: true
+                    }
+                },
                 files: {
                     "dist/umdrouter.min.js": ["src/umdrouter.js"]
                 }
@@ -38,6 +46,6 @@ module.exports = function ( grunt ) {
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     
-    grunt.registerTask("default", ["jshint"]);
+    grunt.registerTask("default", ["jshint", "uglify"]);
     
 };

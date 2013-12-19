@@ -1,11 +1,9 @@
 (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
+    if (typeof define === "function" && define.amd) {
         define([], factory);
     } else if (typeof exports === "object") {
         module.exports = factory();
     } else {
-        // Browser globals
         root.Router = factory();
     }
 }(this, function () {
@@ -21,6 +19,8 @@
         window.onhashchange = function () {
             self.process();
         };
+        
+        self.process();
     };
     
     /**
