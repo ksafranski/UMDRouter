@@ -8,13 +8,13 @@
 
     <script>
 
-        var routes = new Router();
+        var router = new UMDRouter();
 
         /**
          * Simple static
          * ex: #/user
          */
-        routes.on("/user", function () {
+        router.on("/user", function () {
             console.log("User Route");
         });
 
@@ -22,7 +22,7 @@
          * Simple dynamic
          * ex: #/user/12345
          */
-        routes.on("/user/:id", function (id) {
+        router.on("/user/:id", function (id) {
             console.log("User Route, ID: " + id);
         });
 

@@ -4,7 +4,7 @@
     } else if (typeof exports === "object") {
         module.exports = factory();
     } else {
-        root.Router = factory();
+        root.UMDRouter = factory();
     }
 }(this, function () {
 
@@ -12,7 +12,7 @@
      * Router constructor function
      * @constructor Router
      */
-    var Router = function () {
+    var UMDRouter = function () {
         var self = this;
 
         // Watch hashchange
@@ -28,17 +28,17 @@
 
     /**
      * Container object for routes
-     * @memberof Router
+     * @memberof UMDRouter
      * @member {Object}
      */
-    Router.prototype.routes = {};
+    UMDRouter.prototype.routes = {};
 
     /**
      * Processes/matches routes and fires callback
-     * @memberof Router
+     * @memberof UMDRouter
      * @method process
      */
-    Router.prototype.process = function () {
+    UMDRouter.prototype.process = function () {
         var self = this,
             fragment = window.location.hash.replace("#", ""),
             matcher,
@@ -75,29 +75,29 @@
 
     /**
      * Method to reload (refresh) the route
-     * @memberof Router
+     * @memberof UMDRouter
      * @method reload
      */
-    Router.prototype.reload = function () {
+    UMDRouter.prototype.reload = function () {
         this.process();
     };
 
     /**
      * Method for binding route to callback
-     * @memberof Router
+     * @memberof UMDRouter
      * @method on
      */
-    Router.prototype.on = function (path, cb) {
+    UMDRouter.prototype.on = function (path, cb) {
         this.routes[path] = cb;
     };
 
     /**
      * Method for programatically navigating to route
-     * @memberof Router
+     * @memberof UMDRouter
      * @method go
      * @param {string} path - The route to navigate to
      */
-    Router.prototype.go = function (path) {
+    UMDRouter.prototype.go = function (path) {
         var location = window.location,
             root = location.pathname.replace(/[^\/]$/, "$&"),
             url,
@@ -124,8 +124,8 @@
     };
 
     /**
-     * @returns the Router contructor
+     * @returns the UMDRouter contructor
      */
-    return Router;
+    return UMDRouter;
 
 }));
