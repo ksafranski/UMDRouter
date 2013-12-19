@@ -1,23 +1,49 @@
 (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['require', 'underscore'], factory);
+        define(['require', 'underscore', 'postal'], factory);
     } else {
         root.Router = factory(root.b);
     }
-}(this, function(require, _) {
+}(this, function(require, _, postal) {
 
-	var UMDRoute = function(options, args) {
+	var UMDRoute = function(options) {
 
 		var self = this;
 
-		options = options || {};
-		_.extend(this, options);
+		options.route = _.clone(options.route);
 
-		args.unshift(function() {
+		if ( _.isObject(options.route.extend) ) {
+			_.extend(this, options.route.extend);
+			delete options.route.extend;
+		}
+
+		var interval_ids = [];
+		var postal_subscriptions = [];
+
+		_.extend(this, options.route, {
+			'container': options.container,
+			'setInterval': function(fn, timeout) {
+				interval_ids.push(setInterval(fn, timeout));
+			},
+			'subscribe': function(options) {
+				postal_subscriptions.push(postal.subscribe(options));
+			},
+			'_unload': function() {
+				_.each(interval_ids, function(iid) {
+					clearInterval(iid);
+				});
+				_.each(postal_subscriptions, function(psub) {
+					psub.unsubscribe();
+				});
+				self.unload();
+			}
+		});
+
+		options.args.unshift(function() {
 			self.load();
 		});
 
-		this.init.apply(this, args);
+		this.init.apply(this, options.args);
 
 	};
 

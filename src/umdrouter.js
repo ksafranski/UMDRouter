@@ -13,9 +13,28 @@
      *
      * @constructor Router
      */
-    var Router = function() {
+    var Router = function(options) {
 
         var self = this;
+
+        options = options || {};
+
+		_.defaults(options, {
+			'route_container': null,
+			'template_loader': null
+		});
+
+		if ( options.route_container.substring(0, 1) === '#' ) {
+			options.route_container = options.route_container.substring(1);
+		}
+
+		self.route_container = document.getElementById(options.route_container);
+
+		if ( !self.route_container ) {
+			throw 'Specified route container does not exist: ' + options.route_container;
+		}
+
+		self.template_loader = options.template_loader;
 
         // Watch hashchange
         window.onhashchange = function() {
@@ -33,17 +52,31 @@
 
     /**
      * Container object for routes
+     *
      * @memberof Router
      * @member {Object}
      */
     Router.prototype.routes = {};
 
     /**
+     * Call this method once all of your routes have been defined.
+     *
+     * @method ready
+     */
+    Router.prototype.ready = function() {
+		if ( document.readyState === "complete" ) {
+	    	this.process();
+		}
+    };
+
+    /**
      * Processes/matches routes and fires callback
+     *
      * @memberof Router
      * @method process
      */
     Router.prototype.process = function() {
+
         var self = this,
             fragment = window.location.hash.replace("#", ""),
             matcher,
@@ -61,21 +94,45 @@
 
 		self.unloadActiveRoute();
 
-		self.activeRoute = new UMDRoute(matched.route, matched.args);
+		self.getTemplate(matched.name, function(err, template) {
+
+			if ( err ) {
+				throw 'Error loading template for route: `' + matched.name + '`';
+			}
+
+			self.route_container.innerHTML = template;
+
+			self.activeRoute = new UMDRoute({
+				'name': matched.name,
+				'route': matched.route,
+				'args': matched.args,
+				'container': self.route_container
+			});
+
+		});
 
     };
 
+	/**
+	 * Calls the `unload` method of the currently active route (if it exists).
+	 *
+	 * @method unloadActiveRoute
+	 */
     Router.prototype.unloadActiveRoute = function() {
     	if ( !this.activeRoute ) {
     		return;
     	}
-    	this.activeRoute.unload();
+    	this.activeRoute._unload();
     	this.activeRoute = null;
     };
 
-    Router.prototype.getArgs = function() {
-    };
-
+	/**
+	 * Analyzes the current URL and returns an object containing data related to the
+	 * matching route, if found. Otherwise, returns null.
+	 *
+	 * @method getMatchedRoute
+	 * @return {Mixed}
+	 */
     Router.prototype.getMatchedRoute = function() {
 
         var self = this,
@@ -89,6 +146,7 @@
         // Match root
         if ( fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/") ) {
         	return {
+        		'name': '/',
         		'route': self.routes["/"],
         		'args': []
         	};
@@ -111,6 +169,7 @@
             	return null;
             }
 			return {
+				'name': matched,
 				'route': self.routes[matched],
 				'args': args
 			};
@@ -149,6 +208,26 @@
     		}
     	});
         this.routes[path] = options;
+    };
+
+	/**
+	 * Fetches the template associated with a route.
+	 *
+	 * @method getTemplate
+	 * @param {String} routeName - The name of the route in question.
+	 * @param {Function} callback - Callback function to be fired when the template is ready.
+	 */
+    Router.prototype.getTemplate = function(routeName, callback) {
+    	var route = this.routes[routeName];
+    	if ( !route.template ) {
+    		callback(false, null);
+    	}
+    	if ( !_.isFunction(this.template_loader) ) {
+    		throw 'No function has been defined for `template_loader`.';
+    	}
+    	this.template_loader(route.template, function(err, template) {
+    		callback(err, template);
+    	});
     };
 
     /**
