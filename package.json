@@ -1,0 +1,14 @@
+{
+    "name": "UMDRouter",
+    "version": "0.0.1",
+    "description": "Simple UMD Router for Any Occasion",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Fluidbyte/UMDRouter.git"
+    },
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-jshint": "~0.6.4",
+        "grunt-contrib-uglify": "~0.2.0"
+    }
+}
