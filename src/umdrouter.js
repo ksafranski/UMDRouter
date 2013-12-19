@@ -86,9 +86,27 @@
      * Method for binding route to callback
      * @memberof UMDRouter
      * @method on
+     * @param {string} route - The route to match against
+     * @param {function|object} handler - The callback function or functions (object)
      */
-    UMDRouter.prototype.on = function (path, cb) {
-        this.routes[path] = cb;
+    UMDRouter.prototype.on = function (route, handler) {
+        // Build function(s) into route object
+        if (handler && typeof handler === "function") {
+            // Just passed a single load function
+            this.routes[route].before = false;
+            this.routes[route].load = handler;
+            this.routes[route].unload = false;
+        } else if (handler && typeof handler === "object") {
+            // Passed an object
+            this.routes.before = (handler.before) ? handler.before : false;
+            this.routes.load = (handler.load) ? handler.load : false;
+            this.routes.unload = (handler.unload) ? handler.unload : false;
+        } else {
+            throw "Error creating route";
+        }
+
+        // Set current to false by default, used to track active route
+        this.routes[route].current = false;
     };
 
     /**

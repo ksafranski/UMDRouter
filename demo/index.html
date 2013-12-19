@@ -7,6 +7,7 @@
     <script src="../src/umdrouter.js"></script>
 
     <script>
+        /* global UMDRouter */
 
         var router = new UMDRouter();
 
@@ -24,6 +25,22 @@
          */
         router.on("/user/:id", function (id) {
             console.log("User Route, ID: " + id);
+        });
+
+        /**
+         * Object static
+         * ex: #/profile
+         */
+        router.on("/profile", {
+            before: function () {
+                console.log("Profile BEFORE load");
+            },
+            load: function () {
+                console.log("Profile ON load");
+            },
+            unload: function () {
+                console.log("Profile UNLOAD");
+            }
         });
 
     </script>
