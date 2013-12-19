@@ -1,15 +1,15 @@
 <html>
-    
+
     <head>
         <title>Router</title>
     </head>
-    
+
     <script src="../src/umdrouter.js"></script>
-    
+
     <script>
-        
+
         var routes = new Router();
-        
+
         /**
          * Simple static
          * ex: #/user
@@ -17,7 +17,7 @@
         routes.on("/user", function () {
             console.log("User Route");
         });
-        
+
         /**
          * Simple dynamic
          * ex: #/user/12345
@@ -25,10 +25,8 @@
         routes.on("/user/:id", function (id) {
             console.log("User Route, ID: " + id);
         });
-        
-        //routes.process();
-        
+
     </script>
-    
-    
+
+
 </html>

@@ -7,7 +7,7 @@
         root.Router = factory();
     }
 }(this, function () {
-    
+
     /**
      * Router constructor function
      * @constructor Router
@@ -52,7 +52,7 @@
         if (fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/")) {
             self.routes["/"].apply(this);
         } else {
-            // Match routes    
+            // Match routes
             for (route in self.routes) {
                 matcher = fragment.match(new RegExp(route.replace(/:[^\s/]+/g, "([\\w-]+)")));
                 if (matcher !== null && route !== "/") {
@@ -66,7 +66,9 @@
                     matched = route;
                 }
             }
-            self.routes[matched].apply(this, args);
+            if (self.routes.hasOwnProperty(matched)) {
+                self.routes[matched].apply(this, args);
+            }
         }
 
     };
@@ -120,10 +122,10 @@
             self.process();
         }
     };
-    
+
     /**
      * @returns the Router contructor
      */
     return Router;
-    
+
 }));
