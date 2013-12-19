@@ -1,10 +1,10 @@
 (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['require', 'underscore', 'postal'], factory);
+        define(['underscore', 'postal'], factory);
     } else {
-        root.Router = factory(root.b);
+        root.Router = factory(root._, root.postal);
     }
-}(this, function(require, _, postal) {
+}(this, function(_, postal) {
 
 	var UMDRoute = function(options) {
 
@@ -20,7 +20,7 @@
 		var interval_ids = [];
 		var postal_subscriptions = [];
 
-		_.extend(this, options.route, {
+		_.extend(this, options.global_extensions, options.route, {
 			'container': options.container,
 			'setInterval': function(fn, timeout) {
 				interval_ids.push(setInterval(fn, timeout));

@@ -4,7 +4,7 @@
         define(['underscore', 'umdrouter/umdroute'], factory);
     } else {
         // Browser globals
-        root.Router = factory(root.b);
+        root.Router = factory(root._, root.UMDRoute);
     }
 }(this, function(_, UMDRoute) {
 
@@ -21,7 +21,8 @@
 
 		_.defaults(options, {
 			'route_container': null,
-			'template_loader': null
+			'template_loader': null,
+			'extend': {}
 		});
 
 		if ( options.route_container.substring(0, 1) === '#' ) {
@@ -29,6 +30,8 @@
 		}
 
 		self.route_container = document.getElementById(options.route_container);
+
+		self.global_extensions = options.extend;
 
 		if ( !self.route_container ) {
 			throw 'Specified route container does not exist: ' + options.route_container;
@@ -106,7 +109,8 @@
 				'name': matched.name,
 				'route': matched.route,
 				'args': matched.args,
-				'container': self.route_container
+				'container': self.route_container,
+				'global_extensions': self.global_extensions
 			});
 
 		});

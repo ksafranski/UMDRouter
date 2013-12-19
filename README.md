@@ -24,6 +24,16 @@ Create a new instance of UMD Router as shown below.
 		 */
 		'template_loader': function(template, callback) {
 			callback(false, "<div style='border: 1px solid red;'></div>");
+		},
+
+		/**
+		 * Methods and properties that are defined here are inherited by every
+		 * defined route.
+		 */
+		'extend': {
+			'globalTest': function() {
+				console.log("Its'a me'a, Mario. Okie dokie.");
+			}
 		}
 
 	});
@@ -55,6 +65,7 @@ http://site.com/#something OR http://site.com/#something/param1/param2/etc…
 		'load': function() {
 
 			this.test();
+			this.globalTest();
 
 			console.log(this.container);
 
@@ -91,3 +102,10 @@ http://site.com/#something OR http://site.com/#something/param1/param2/etc…
 		}
 
 	});
+
+## Wrap it Up
+
+When you are done defining your routes, call:
+
+	router.ready();
+
