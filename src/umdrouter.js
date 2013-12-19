@@ -1,29 +1,34 @@
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define([], factory);
-    } else if (typeof exports === "object") {
-        module.exports = factory();
+(function(root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['underscore', 'umdrouter/umdroute'], factory);
     } else {
-        root.Router = factory();
+        // Browser globals
+        root.Router = factory(root.b);
     }
-}(this, function () {
-    
+}(this, function(_, UMDRoute) {
+
     /**
      * Router constructor function
+     *
      * @constructor Router
      */
-    var Router = function () {
+    var Router = function() {
+
         var self = this;
 
         // Watch hashchange
-        window.onhashchange = function () {
+        window.onhashchange = function() {
             self.process();
         };
 
         // Run on load
-        window.onload = function () {
+        window.onload = function() {
             self.process();
         };
+
+        self.activeRoute = null;
+
     };
 
     /**
@@ -38,7 +43,7 @@
      * @memberof Router
      * @method process
      */
-    Router.prototype.process = function () {
+    Router.prototype.process = function() {
         var self = this,
             fragment = window.location.hash.replace("#", ""),
             matcher,
@@ -46,47 +51,104 @@
             args = [],
             matched,
             i,
-            z;
+            z,
+            routeInstance;
+
+		matched = this.getMatchedRoute();
+		if ( !matched ) {
+			return;
+		}
+
+		self.unloadActiveRoute();
+
+		self.activeRoute = new UMDRoute(matched.route, matched.args);
+
+    };
+
+    Router.prototype.unloadActiveRoute = function() {
+    	if ( !this.activeRoute ) {
+    		return;
+    	}
+    	this.activeRoute.unload();
+    	this.activeRoute = null;
+    };
+
+    Router.prototype.getArgs = function() {
+    };
+
+    Router.prototype.getMatchedRoute = function() {
+
+        var self = this,
+            fragment = window.location.hash.replace("#", ""),
+            matched,
+            matcher,
+            route,
+            argString,
+            args = [];
 
         // Match root
-        if (fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/")) {
-            self.routes["/"].apply(this);
+        if ( fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/") ) {
+        	return {
+        		'route': self.routes["/"],
+        		'args': []
+        	};
         } else {
-            // Match routes    
-            for (route in self.routes) {
+            // Match routes
+            for ( route in self.routes ) {
                 matcher = fragment.match(new RegExp(route.replace(/:[^\s/]+/g, "([\\w-]+)")));
-                if (matcher !== null && route !== "/") {
+                if ( matcher !== null && route !== "/" ) {
+                	matched = route;
                     args = [];
-                    // Get args
-                    if (matcher.length > 1) {
-                        for (i = 1, z = matcher.length; i < z; i++) {
-                            args.push(matcher[i]);
-                        }
-                    }
-                    matched = route;
+					argString = matcher.input.substring(route.length);
+					if ( argString.substring(0, 1) === '/' ) {
+						argString = argString.substring(1);
+					}
+					args = argString.split('/');
+                    break;
                 }
             }
-            self.routes[matched].apply(this, args);
+            if ( !matched ) {
+            	return null;
+            }
+			return {
+				'route': self.routes[matched],
+				'args': args
+			};
         }
 
     };
 
     /**
      * Method to reload (refresh) the route
+     *
      * @memberof Router
      * @method reload
      */
-    Router.prototype.reload = function () {
+    Router.prototype.reload = function() {
         this.process();
     };
 
     /**
      * Method for binding route to callback
+     *
      * @memberof Router
      * @method on
      */
-    Router.prototype.on = function (path, cb) {
-        this.routes[path] = cb;
+    Router.prototype.createRoute = function(path, options) {
+    	if ( this.routes[path] ) {
+    		throw 'Route `' + path + '` has already been defined.';
+    	}
+    	options = options || {};
+    	_.defaults(options, {
+    		'init': function(fn) {
+    			fn();
+    		},
+    		'load': function() {
+    		},
+    		'unload': function() {
+    		}
+    	});
+        this.routes[path] = options;
     };
 
     /**
@@ -95,7 +157,7 @@
      * @method go
      * @param {string} path - The route to navigate to
      */
-    Router.prototype.go = function (path) {
+    Router.prototype.go = function(path) {
         var location = window.location,
             root = location.pathname.replace(/[^\/]$/, "$&"),
             url,
@@ -110,7 +172,7 @@
             url = root + location.search;
         }
 
-        if (history.pushState) {
+        if ( history.pushState ) {
             // Browser supports pushState()
             history.pushState(null, document.title, url);
             self.process();
@@ -120,10 +182,10 @@
             self.process();
         }
     };
-    
+
     /**
      * @returns the Router contructor
      */
     return Router;
-    
+
 }));
