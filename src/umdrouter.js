@@ -14,22 +14,25 @@
      */
     var Router = function () {
         var self = this;
-        
+
         // Watch hashchange
         window.onhashchange = function () {
             self.process();
         };
-        
-        self.process();
+
+        // Run on load
+        window.onload = function () {
+            self.process();
+        };
     };
-    
+
     /**
      * Container object for routes
      * @memberof Router
      * @member {Object}
      */
     Router.prototype.routes = {};
-    
+
     /**
      * Processes/matches routes and fires callback
      * @memberof Router
@@ -37,33 +40,46 @@
      */
     Router.prototype.process = function () {
         var self = this,
-            fragment = window.location.hash.replace("#",""),
+            fragment = window.location.hash.replace("#", ""),
             matcher,
-            args = [];
-        
+            route,
+            args = [],
+            matched,
+            i,
+            z;
+
         // Match root
         if (fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/")) {
             self.routes["/"].apply(this);
         } else {
             // Match routes    
-            for (var route in self.routes) {
+            for (route in self.routes) {
                 matcher = fragment.match(new RegExp(route.replace(/:[^\s/]+/g, "([\\w-]+)")));
                 if (matcher !== null && route !== "/") {
-                    // Fix greedy regex
                     args = [];
                     // Get args
                     if (matcher.length > 1) {
-                        for (var i=1, z=matcher.length; i<z; i++) {
+                        for (i = 1, z = matcher.length; i < z; i++) {
                             args.push(matcher[i]);
                         }
                     }
-                    self.routes[route].apply(this, args);
+                    matched = route;
                 }
             }
+            self.routes[matched].apply(this, args);
         }
-        
+
     };
-    
+
+    /**
+     * Method to reload (refresh) the route
+     * @memberof Router
+     * @method reload
+     */
+    Router.prototype.reload = function () {
+        this.process();
+    };
+
     /**
      * Method for binding route to callback
      * @memberof Router
@@ -72,19 +88,19 @@
     Router.prototype.on = function (path, cb) {
         this.routes[path] = cb;
     };
-    
+
     /**
      * Method for programatically navigating to route
      * @memberof Router
      * @method go
-     * @param {string} path - The path of the route to navigate to
+     * @param {string} path - The route to navigate to
      */
     Router.prototype.go = function (path) {
         var location = window.location,
             root = location.pathname.replace(/[^\/]$/, "$&"),
             url,
             self = this;
-    
+
         // Handle url composition
         if (path.length) {
             // Fragment exists
@@ -93,7 +109,7 @@
             // Null/Blank fragment, nav to root
             url = root + location.search;
         }
-    
+
         if (history.pushState) {
             // Browser supports pushState()
             history.pushState(null, document.title, url);
