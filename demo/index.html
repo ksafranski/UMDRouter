@@ -12,6 +12,10 @@
         <a href="#/user/12345">#/user/12345</a>
         <br>
         <a href="#/profile">#/profile</a>
+        <br>
+        <a href="#/profile/12345">#/profile/12345 - Not allowed (return false)</a>
+        <br>
+        <a href="#/profile/45678">#/profile/45678 - Allowed</a>
 
     <script src="../src/umdrouter.js"></script>
 
@@ -43,13 +47,30 @@
         router.on("/profile", {
             before: function () {
                 console.log("Profile BEFORE load");
-                return false;
             },
             load: function () {
                 console.log("Profile ON load");
             },
             unload: function () {
                 console.log("Profile UNLOAD");
+            }
+        });
+
+        /**
+         * Object dynamic with before return false
+         * ex: #/profile/12345
+         */
+        router.on("/profile/:id", {
+            before: function (id) {
+                if (id === "12345") {
+                    return false;
+                }
+            },
+            load: function (id) {
+                console.log("Loaded profile " + id);
+            },
+            unload: function () {
+                console.log("Unloaded profile");
             }
         });
 

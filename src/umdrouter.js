@@ -47,6 +47,7 @@
      */
     UMDRouter.prototype.process = function () {
         var self = this,
+            fragment = window.location.hash.replace("#", ""),
             match = self.match(),
             route = match.route,
             args = match.args,
@@ -56,7 +57,7 @@
 
         // Get prev_route
         if (self.history.length !== 0) {
-            prevRoute = self.routes[self.history[self.history.length-1]];
+            prevRoute = self.routes[self.history[self.history.length-1].matcher];
         }
 
         // Ensure a match has been made
@@ -78,13 +79,13 @@
 
             // If before returned false, go back
             if (!before) {
-                self.go(self.history[self.history.length-1]);
+                self.go(self.history[self.history.length-1].fragment);
             }
 
             // Check and run 'load' if fn exists and before has passed
             if (routeObj.load && before) {
                 routeObj.load.apply(this, args);
-                self.history.push(route);
+                self.history.push({ matcher: route, fragment: fragment });
             }
         }
 
