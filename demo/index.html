@@ -4,6 +4,15 @@
         <title>Router</title>
     </head>
 
+    <body>
+
+
+        <a href="#/user">#/user</a>
+        <br>
+        <a href="#/user/12345">#/user/12345</a>
+        <br>
+        <a href="#/profile">#/profile</a>
+
     <script src="../src/umdrouter.js"></script>
 
     <script>
@@ -34,6 +43,7 @@
         router.on("/profile", {
             before: function () {
                 console.log("Profile BEFORE load");
+                //return false;
             },
             load: function () {
                 console.log("Profile ON load");

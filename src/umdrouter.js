@@ -29,28 +29,85 @@
     /**
      * Container object for routes
      * @memberof UMDRouter
-     * @member {Object}
+     * @member {object}
      */
     UMDRouter.prototype.routes = {};
 
     /**
-     * Processes/matches routes and fires callback
+     * Container array for history
+     * @memberof UMDRouter
+     * @member {array}
+     */
+    UMDRouter.prototype.history = [];
+
+    /**
+     * Processes route change
      * @memberof UMDRouter
      * @method process
      */
     UMDRouter.prototype.process = function () {
         var self = this,
+            match = self.match(),
+            route = match.route,
+            args = match.args,
+            before = true,
+            prev_route = false;
+
+            // Get prev_route
+            if (self.history.length !== 0) {
+                prev_route = self.routes[self.history[self.history.length-1]];
+            }
+
+            // Ensure a match has been made
+            if (route) {
+                route = self.routes[route];
+
+                // Get current route and unload
+                if (prev_route && prev_route.unload) {
+                    console.log(prev_route.unload);
+                    prev_route.unload.apply(this);
+                }
+
+                // Check and run 'before'
+                if (route.before) {
+                    before = route.before.apply(this, args);
+                    if (before === undefined) {
+                        before = true;
+                    }
+                }
+
+                // If before returned false, go back
+                if (!before) {
+                    console.log("GO BACK!");
+                }
+
+                // Check and run 'load' if fn exists and before has passed
+                if (route.load && before) {
+                    route.load.apply(this, args);
+                    self.history.push(route);
+                }
+            }
+
+    };
+
+    /**
+     * Matches routes and fires callback
+     * @memberof UMDRouter
+     * @method match
+     */
+    UMDRouter.prototype.match = function () {
+        var self = this,
             fragment = window.location.hash.replace("#", ""),
             matcher,
             route,
             args = [],
-            matched,
+            matched = false,
             i,
             z;
 
         // Match root
         if (fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/")) {
-            self.routes["/"].apply(this);
+            matched = "/";
         } else {
             // Match routes
             for (route in self.routes) {
@@ -63,13 +120,13 @@
                             args.push(matcher[i]);
                         }
                     }
-                    matched = route;
+                    matched = { route: route, args: args};
                 }
             }
-            if (self.routes.hasOwnProperty(matched)) {
-                self.routes[matched].apply(this, args);
-            }
         }
+
+        // Return matched and arguments
+        return matched;
 
     };
 
@@ -90,6 +147,7 @@
      * @param {function|object} handler - The callback function or functions (object)
      */
     UMDRouter.prototype.on = function (route, handler) {
+        this.routes[route] = {};
         // Build function(s) into route object
         if (handler && typeof handler === "function") {
             // Just passed a single load function
@@ -98,15 +156,12 @@
             this.routes[route].unload = false;
         } else if (handler && typeof handler === "object") {
             // Passed an object
-            this.routes.before = (handler.before) ? handler.before : false;
-            this.routes.load = (handler.load) ? handler.load : false;
-            this.routes.unload = (handler.unload) ? handler.unload : false;
+            this.routes[route].before = (handler.before) ? handler.before : false;
+            this.routes[route].load = (handler.load) ? handler.load : false;
+            this.routes[route].unload = (handler.unload) ? handler.unload : false;
         } else {
             throw "Error creating route";
         }
-
-        // Set current to false by default, used to track active route
-        this.routes[route].current = false;
     };
 
     /**
