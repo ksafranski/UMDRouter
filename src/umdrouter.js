@@ -51,42 +51,42 @@
             route = match.route,
             args = match.args,
             before = true,
-            prev_route = false;
+            prevRoute = false,
+            routeObj = [];
 
-            // Get prev_route
-            if (self.history.length !== 0) {
-                prev_route = self.routes[self.history[self.history.length-1]];
+        // Get prev_route
+        if (self.history.length !== 0) {
+            prevRoute = self.routes[self.history[self.history.length-1]];
+        }
+
+        // Ensure a match has been made
+        if (route) {
+            routeObj = self.routes[route];
+
+            // Get current route and unload
+            if (prevRoute && prevRoute.unload) {
+                prevRoute.unload.apply(this);
             }
 
-            // Ensure a match has been made
-            if (route) {
-                route = self.routes[route];
-
-                // Get current route and unload
-                if (prev_route && prev_route.unload) {
-                    console.log(prev_route.unload);
-                    prev_route.unload.apply(this);
-                }
-
-                // Check and run 'before'
-                if (route.before) {
-                    before = route.before.apply(this, args);
-                    if (before === undefined) {
-                        before = true;
-                    }
-                }
-
-                // If before returned false, go back
-                if (!before) {
-                    console.log("GO BACK!");
-                }
-
-                // Check and run 'load' if fn exists and before has passed
-                if (route.load && before) {
-                    route.load.apply(this, args);
-                    self.history.push(route);
+            // Check and run 'before'
+            if (routeObj.before) {
+                before = routeObj.before.apply(this, args);
+                if (before === undefined) {
+                    before = true;
                 }
             }
+
+            // If before returned false, go back
+            if (!before) {
+                self.go(self.history[self.history.length-1]);
+            }
+
+            // Check and run 'load' if fn exists and before has passed
+            if (routeObj.load && before) {
+                routeObj.load.apply(this, args);
+                self.history.push(route);
+            }
+        }
 
     };
 

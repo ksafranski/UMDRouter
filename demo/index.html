@@ -43,7 +43,7 @@
         router.on("/profile", {
             before: function () {
                 console.log("Profile BEFORE load");
-                //return false;
+                return false;
             },
             load: function () {
                 console.log("Profile ON load");
