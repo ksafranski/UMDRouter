@@ -57,8 +57,9 @@
          * ex: #/profile
          */
         router.on("/profile", {
-            before: function () {
+            before: function (fn) {
                 console.log("Profile BEFORE load");
+                fn(false);
             },
             load: function () {
                 console.log("Profile ON load");
@@ -84,10 +85,11 @@
          * ex: #/profile/12345
          */
         router.on("/profile/:id", {
-            before: function (id) {
+            before: function (fn, id) {
                 if (id === "12345") {
-                    return false;
+					fn(false);
                 }
+                fn(true);
             },
             load: function (id) {
                 console.log("Loaded profile " + id);
