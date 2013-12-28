@@ -1,4 +1,4 @@
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === "function" && define.amd) {
         define([], factory);
     } else if (typeof exports === "object") {
@@ -6,22 +6,22 @@
     } else {
         root.UMDRouter = factory();
     }
-}(this, function () {
+}(this, function() {
 
     /**
      * Router constructor function
      * @constructor Router
      */
-    var UMDRouter = function () {
+    var UMDRouter = function() {
         var self = this;
 
         // Watch hashchange
-        window.onhashchange = function () {
+        window.onhashchange = function() {
             self.process();
         };
 
         // Run on load
-        window.onload = function () {
+        window.onload = function() {
             self.process();
         };
     };
@@ -45,7 +45,7 @@
      * @memberof UMDRouter
      * @method process
      */
-    UMDRouter.prototype.process = function () {
+    UMDRouter.prototype.process = function() {
         var self = this,
             fragment = window.location.hash.replace("#", ""),
             match = self.match(),
@@ -53,6 +53,7 @@
             args = match.args,
             before = true,
             prevRoute = false,
+            prevSandbox = null,
             routeObj = [];
 
         // Get prev_route
@@ -67,6 +68,9 @@
             // Get current route and unload
             if (prevRoute && prevRoute.unload) {
                 prevRoute.unload.apply(this);
+				for ( var key in UMDRouter.unloadFunctions ) {
+					UMDRouter.unloadFunctions[key].apply(prevSandbox);
+				}
             }
 
             // Check and run 'before'
@@ -84,10 +88,42 @@
 
             // Check and run 'load' if fn exists and before has passed
             if (routeObj.load && before) {
-                routeObj.load.apply(this, args);
+
+            	var sandbox = this.createSandbox(route);
+            	prevSandbox = sandbox;
+
+                routeObj.load.apply(sandbox, args);
                 self.history.push({ matcher: route, fragment: fragment });
             }
         }
+
+    };
+
+    /**
+     * @method createSandbox
+     */
+    UMDRouter.prototype.createSandbox = function(route) {
+
+    	var sandbox = {},
+			routeObj = this.routes[route];
+
+		for ( var key in routeObj.extend ) {
+			if ( typeof routeObj.extend[key] === 'function' ) {
+				sandbox[key] = routeObj.extend[key].bind(sandbox);
+			} else {
+				sandbox[key] = routeObj.extend[key];
+			}
+		}
+
+		for ( var key in UMDRouter.extensions ) {
+			if ( typeof UMDRouter.extensions[key] === 'function' ) {
+				sandbox[key] = UMDRouter.extensions[key].bind(sandbox);
+			} else {
+				sandbox[key] = UMDRouter.extensions[key];
+			}
+		}
+
+		return sandbox;
 
     };
 
@@ -96,7 +132,7 @@
      * @memberof UMDRouter
      * @method match
      */
-    UMDRouter.prototype.match = function () {
+    UMDRouter.prototype.match = function() {
         var self = this,
             fragment = window.location.hash.replace("#", ""),
             matcher,
@@ -136,7 +172,7 @@
      * @memberof UMDRouter
      * @method reload
      */
-    UMDRouter.prototype.reload = function () {
+    UMDRouter.prototype.reload = function() {
         this.process();
     };
 
@@ -147,22 +183,41 @@
      * @param {string} route - The route to match against
      * @param {function|object} handler - The callback function or functions (object)
      */
-    UMDRouter.prototype.on = function (route, handler) {
-        this.routes[route] = {};
-        // Build function(s) into route object
-        if (handler && typeof handler === "function") {
-            // Just passed a single load function
-            this.routes[route].before = false;
-            this.routes[route].load = handler;
-            this.routes[route].unload = false;
-        } else if (handler && typeof handler === "object") {
-            // Passed an object
-            this.routes[route].before = (handler.before) ? handler.before : false;
-            this.routes[route].load = (handler.load) ? handler.load : false;
-            this.routes[route].unload = (handler.unload) ? handler.unload : false;
-        } else {
-            throw "Error creating route";
-        }
+    UMDRouter.prototype.on = function(route, handler) {
+
+    	var handlerObj = {};
+
+    	if ( typeof handler === "function" ) {
+    		handlerObj.load = handler;
+    	} else if ( typeof handler === "object" ) {
+			handlerObj = handler;
+    	} else {
+	    	throw "Error creating route: " + route + ". `handler` must be a function or object.";
+    	}
+
+		this.defaults(handlerObj, {
+			'before': null,
+			'load': null,
+			'unload': null,
+			'extend': {}
+		});
+
+		this.routes[route] = handlerObj;
+
+    };
+
+	/**
+	 * See underscore.defaults().
+	 *
+	 * @method defaults
+	 */
+    UMDRouter.prototype.defaults = function(obj, defaults) {
+    	obj = obj || {};
+    	for ( var key in defaults ) {
+    		if ( !obj[key] ) {
+    			obj[key] = defaults[key];
+    		}
+    	}
     };
 
     /**
@@ -171,7 +226,8 @@
      * @method go
      * @param {string} path - The route to navigate to
      */
-    UMDRouter.prototype.go = function (path) {
+    UMDRouter.prototype.go = function(path) {
+
         var location = window.location,
             root = location.pathname.replace(/[^\/]$/, "$&"),
             url,
@@ -195,6 +251,35 @@
             location.replace(root + url);
             self.process();
         }
+    };
+
+    UMDRouter.extensions = {};
+
+    /**
+     * @method extend
+     */
+    UMDRouter.extend = function(ext) {
+
+    	if ( typeof ext !== 'object' ) {
+    		throw 'Invalid extension specified.';
+    	}
+
+    	for ( var key in ext ) {
+    		UMDRouter.extensions[key] = ext[key];
+    	}
+
+    };
+
+    UMDRouter.unloadFunctions = [];
+
+    UMDRouter.unload = function(fn) {
+
+    	if ( typeof fn !== 'function' ) {
+    		throw 'Invalid callback function specified.';
+    	}
+
+    	UMDRouter.unloadFunctions.push(fn);
+
     };
 
     /**

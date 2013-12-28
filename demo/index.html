@@ -24,12 +24,24 @@
 
         var router = new UMDRouter();
 
+		UMDRouter.extend({
+			'sayCheese': function() {
+				console.log('Cheese!');
+			}
+		});
+
+		UMDRouter.unload(function() {
+			console.log('I am unloading.');
+		});
+
         /**
          * Simple static
          * ex: #/user
          */
         router.on("/user", function () {
+
             console.log("User Route");
+
         });
 
         /**
@@ -50,9 +62,20 @@
             },
             load: function () {
                 console.log("Profile ON load");
+                this.herp();
+                this.sayCheese();
             },
             unload: function () {
                 console.log("Profile UNLOAD");
+            },
+            extend: {
+            	herp: function() {
+            		console.log('Herp.');
+            		this.derp();
+            	},
+            	derp: function() {
+            		console.log('Derp.');
+            	}
             }
         });
 
