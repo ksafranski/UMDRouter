@@ -5,12 +5,24 @@ module.exports = function ( grunt ) {
      * Grunt Config
      */
     grunt.initConfig({
-        
+
         /**
          * Get package.json data
          */
         pkg: grunt.file.readJSON("package.json"),
-        
+
+        /**
+         * JSBeautifier
+         */
+        jsbeautifier: {
+            dev: {
+                src: ["src/**/*.js"],
+                options: {
+                    config: ".jsbeautifyrc"
+                }
+            }
+        },
+
         /**
          * JSHint
          */
@@ -24,7 +36,10 @@ module.exports = function ( grunt ) {
                 }
             }
         },
-        
+
+        /**
+         * Uglify
+         */
         uglify: {
             src: {
                 options: {
@@ -40,12 +55,13 @@ module.exports = function ( grunt ) {
                 }
             }
         }
-        
+
     });
-        
+
+	grunt.loadNpmTasks("grunt-jsbeautifier");
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-uglify");
-    
-    grunt.registerTask("default", ["jshint", "uglify"]);
-    
+
+    grunt.registerTask("default", ["jsbeautifier", "jshint", "uglify"]);
+
 };
