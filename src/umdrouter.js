@@ -89,13 +89,13 @@
             // Check and run 'load' if fn exists and before has passed
             if (routeObj.load && before) {
 
-            	var sandbox = this.createSandbox(route);
-            	prevSandbox = sandbox;
+				var sandbox = this.createSandbox(route);
+				prevSandbox = sandbox;
 
-                routeObj.load.apply(sandbox, args);
-                self.history.push({ matcher: route, fragment: fragment });
-            }
-        }
+				routeObj.load.apply(sandbox, args);
+				self.history.push({ matcher: route, fragment: fragment });
+			}
+		}
 
     };
 
@@ -104,19 +104,20 @@
      */
     UMDRouter.prototype.createSandbox = function(route) {
 
-    	var sandbox = {},
-			routeObj = this.routes[route];
+		var sandbox = {},
+			routeObj = this.routes[route],
+			key;
 
-		for ( var key in routeObj.extend ) {
-			if ( typeof routeObj.extend[key] === 'function' ) {
+		for ( key in routeObj.extend ) {
+			if ( typeof routeObj.extend[key] === "function" ) {
 				sandbox[key] = routeObj.extend[key].bind(sandbox);
 			} else {
 				sandbox[key] = routeObj.extend[key];
 			}
 		}
 
-		for ( var key in UMDRouter.extensions ) {
-			if ( typeof UMDRouter.extensions[key] === 'function' ) {
+		for ( key in UMDRouter.extensions ) {
+			if ( typeof UMDRouter.extensions[key] === "function" ) {
 				sandbox[key] = UMDRouter.extensions[key].bind(sandbox);
 			} else {
 				sandbox[key] = UMDRouter.extensions[key];
@@ -185,21 +186,21 @@
      */
     UMDRouter.prototype.on = function(route, handler) {
 
-    	var handlerObj = {};
+		var handlerObj = {};
 
-    	if ( typeof handler === "function" ) {
-    		handlerObj.load = handler;
-    	} else if ( typeof handler === "object" ) {
+		if ( typeof handler === "function" ) {
+			handlerObj.load = handler;
+		} else if ( typeof handler === "object" ) {
 			handlerObj = handler;
-    	} else {
-	    	throw "Error creating route: " + route + ". `handler` must be a function or object.";
-    	}
+		} else {
+			throw "Error creating route: " + route + ". `handler` must be a function or object.";
+		}
 
 		this.defaults(handlerObj, {
-			'before': null,
-			'load': null,
-			'unload': null,
-			'extend': {}
+			"before": null,
+			"load": null,
+			"unload": null,
+			"extend": {}
 		});
 
 		this.routes[route] = handlerObj;
@@ -212,12 +213,12 @@
 	 * @method defaults
 	 */
     UMDRouter.prototype.defaults = function(obj, defaults) {
-    	obj = obj || {};
-    	for ( var key in defaults ) {
-    		if ( !obj[key] ) {
-    			obj[key] = defaults[key];
-    		}
-    	}
+		obj = obj || {};
+		for ( var key in defaults ) {
+			if ( !obj[key] ) {
+				obj[key] = defaults[key];
+			}
+		}
     };
 
     /**
@@ -260,13 +261,13 @@
      */
     UMDRouter.extend = function(ext) {
 
-    	if ( typeof ext !== 'object' ) {
-    		throw 'Invalid extension specified.';
-    	}
+		if ( typeof ext !== "object" ) {
+			throw "Invalid extension specified.";
+		}
 
-    	for ( var key in ext ) {
-    		UMDRouter.extensions[key] = ext[key];
-    	}
+		for ( var key in ext ) {
+			UMDRouter.extensions[key] = ext[key];
+		}
 
     };
 
@@ -274,11 +275,11 @@
 
     UMDRouter.unload = function(fn) {
 
-    	if ( typeof fn !== 'function' ) {
-    		throw 'Invalid callback function specified.';
-    	}
+		if ( typeof fn !== "function" ) {
+			throw "Invalid callback function specified.";
+		}
 
-    	UMDRouter.unloadFunctions.push(fn);
+		UMDRouter.unloadFunctions.push(fn);
 
     };
 
