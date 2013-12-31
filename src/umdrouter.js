@@ -51,7 +51,6 @@
 			match = self.match(),
 			route = match.route,
 			args = match.args,
-			before = true,
 			prevRoute = false,
 			prevSandbox = null,
 			routeObj = [];
@@ -76,11 +75,11 @@
 			}
 		}
 
-		var beforeCallback = function(before) {
+		var beforeCallback = function (before) {
 
 			args.shift();
 
-			if ( typeof before === 'undefined' ) {
+			if (typeof before === "undefined") {
 				before = true;
 			}
 
@@ -89,7 +88,7 @@
 				self.go(self.history[self.history.length - 1].fragment);
 			}
 
-			if ( !routeObj.load ) {
+			if (!routeObj.load) {
 				return;
 			}
 
