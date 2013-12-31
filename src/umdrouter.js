@@ -62,23 +62,26 @@
 		}
 
 		// Ensure a match has been made
-		if (route) {
-			routeObj = self.routes[route];
+		if (!route) {
+			return;
+		}
 
-			// Get current route and unload
-			if (prevRoute && prevRoute.unload) {
-				prevRoute.unload.apply(this);
-				for (var key in UMDRouter.unloadFunctions) {
-					UMDRouter.unloadFunctions[key].apply(prevSandbox);
-				}
+		routeObj = self.routes[route];
+
+		// Get current route and unload
+		if (prevRoute && prevRoute.unload) {
+			prevRoute.unload.apply(this);
+			for (var key in UMDRouter.unloadFunctions) {
+				UMDRouter.unloadFunctions[key].apply(prevSandbox);
 			}
+		}
 
-			// Check and run 'before'
-			if (routeObj.before) {
-				before = routeObj.before.apply(this, args);
-				if (before === undefined) {
-					before = true;
-				}
+		var beforeCallback = function(before) {
+
+			args.shift();
+
+			if ( typeof before === 'undefined' ) {
+				before = true;
 			}
 
 			// If before returned false, go back
@@ -86,18 +89,28 @@
 				self.go(self.history[self.history.length - 1].fragment);
 			}
 
-			// Check and run 'load' if fn exists and before has passed
-			if (routeObj.load && before) {
-
-				var sandbox = this.createSandbox(route);
-				prevSandbox = sandbox;
-
-				routeObj.load.apply(sandbox, args);
-				self.history.push({
-					matcher: route,
-					fragment: fragment
-				});
+			if ( !routeObj.load ) {
+				return;
 			}
+
+			var sandbox = self.createSandbox(route);
+			prevSandbox = sandbox;
+
+			routeObj.load.apply(sandbox, args);
+			self.history.push({
+				matcher: route,
+				fragment: fragment
+			});
+
+		};
+
+		// Check and run 'before'
+		if (routeObj.before) {
+			args.unshift(beforeCallback);
+			routeObj.before.apply(this, args);
+			return;
+		} else {
+			beforeCallback(true);
 		}
 
 	};
