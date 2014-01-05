@@ -29,8 +29,12 @@ The router will process an object with at least one of the following:
 
 ```javascript
 router.on("/some/route/", {
-	before: function () {
+	before: function (fn) {
 		// ... do something before firing the route handler ...
+		// Continue:
+		fn(true);
+		// Break:
+		fn(false);
 	},
 	load: function () {
 		// ... do something when the route is matched ...
@@ -49,6 +53,34 @@ The router watches for and matches routes with the `:variable` convention, for e
 router.on("/some/route/:id", function (id) {
     // ... {id} contains the route ID variable
 });
-
+```
 These parameters function the same in the simple, callback method as well as the object-event
 structure.
+
+### Extending
+
+The router is made to allow for extensibility independent of a specific route:
+
+```javascript
+UMDRouter.extend({
+	"sayCheese": function() {
+		console.log("Cheese!");
+	}
+});
+```
+
+Or by extending inside the route itself:
+
+```javascript
+router.on("/profile", {
+	load: function () {
+		this.sayCheese();
+	},
+	extend: {
+		sayCheese: function() {
+			console.log('Cheese!');
+			this.derp();
+		}
+	}
+});
+```
