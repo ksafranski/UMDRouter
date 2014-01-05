@@ -1,0 +1,23 @@
+{
+  "name": "umdrouter",
+  "version": "0.5.0",
+  "homepage": "https://github.com/Fluidbyte/UMDRouter",
+  "authors": [
+    "fluidbyte <kent@fluidbyte.net>"
+  ],
+  "description": "Simple UMD hash-based router",
+  "main": "dist/umdrouter.min.js",
+  "keywords": [
+    "router",
+    "umd",
+    "hash"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
