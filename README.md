@@ -2,6 +2,16 @@
 
 A simple to use router that places nicely with AMD when you need it to.
 
+## Installation
+
+### Via Bower
+
+	$ bower install umdrouter
+
+### Via NPM
+
+	$ npm install umdrouter
+
 ## Usage
 
 First, create an instance of the router:

@@ -1,11 +1,20 @@
 {
-    "name": "UMDRouter",
+    "name": "umdrouter",
     "version": "0.5.0",
     "description": "Simple UMD Router for Any Occasion",
+	"main": "dist/umdrouter.min.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/Fluidbyte/UMDRouter.git"
     },
+    "author": "Kent Safranski <kent@fluidbyte.net> (http://www.fluidbyte.net/)",
+    "contributors": [
+    	{
+    		"name": "Tim Ambler",
+    		"email": "tkambler@gmail.com",
+    		"url": "http://bitcubby.com/"
+    	}
+    ],
     "devDependencies": {
         "grunt": "~0.4.1",
         "grunt-jsbeautifier": "~0.2.0",
