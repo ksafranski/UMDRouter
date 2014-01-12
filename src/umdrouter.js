@@ -77,8 +77,6 @@
 
 		var beforeCallback = function (before) {
 
-			args.shift();
-
 			if (typeof before === "undefined") {
 				before = true;
 			}
