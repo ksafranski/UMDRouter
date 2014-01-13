@@ -1,16 +1,6 @@
 # UMD Router
 
-A simple to use router that places nicely with AMD when you need it to.
-
-## Installation
-
-### Via Bower
-
-	$ bower install umdrouter
-
-### Via NPM
-
-	$ npm install umdrouter
+UMDRouter is a lightweight, dependency-free JavaScript library that provides developers with an easy-to-use mechanism for defining dynamic "routes" based on hashbang and / or push-state history. It can be used in place of heaver solutions such as Sammy.js.
 
 ## Usage
 
@@ -94,3 +84,12 @@ router.on("/profile", {
 	}
 });
 ```
+## Installation
+
+### Via Bower
+
+	$ bower install umdrouter
+
+### Via NPM
+
+	$ npm install umdrouter
