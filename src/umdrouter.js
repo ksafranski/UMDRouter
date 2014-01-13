@@ -75,13 +75,13 @@
 			}
 		}
 
-		var beforeCallback = function(before) {
+		var beforeCallback = function (before) {
 
 			if (typeof before === "undefined") {
 				before = true;
 			}
 
-			if ( typeof args[0] === 'function' ) {
+			if (typeof args[0] === "function") {
 				args.shift();
 			}
 
@@ -96,8 +96,6 @@
 
 			var sandbox = self.createSandbox(route);
 			prevSandbox = sandbox;
-
-			console.log('args', args);
 
 			routeObj.load.apply(sandbox, args);
 			self.history.push({
