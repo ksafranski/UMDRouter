@@ -162,7 +162,7 @@
 
 		// Match root
 		if (fragment === "/" || fragment === "" && self.routes.hasOwnProperty("/")) {
-			matched = "/";
+			matched = { route: "/", args: [] };
 		} else {
 			// Match routes
 			for (route in self.routes) {
